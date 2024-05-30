@@ -2,7 +2,7 @@ FROM python:3.8-slim-buster
 
 WORKDIR /src
 
-COPY requirements.txt .
+COPY ./analytics/requirements.txt .
 
 RUN pip install --upgrade pip && pip install -r ./analytics/requirements.txt
 
