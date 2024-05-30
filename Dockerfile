@@ -1,13 +1,13 @@
-FROM python:3.8-slim-buster
+FROM python:alpine3.19
 
-WORKDIR /src
+WORKDIR /app
+# Copy the requirements file into the container at /app
+COPY requirements.txt /app/
 
-RUN apt-get update && apt-get install -y gcc
+# Install any needed packages specified in requirements.txt
+RUN pip install -r requirements.txt
 
-COPY . .
+COPY . /app/
 
-RUN pip install --upgrade pip && pip install -r requirements.txt
-
-COPY . .
-
+# Specify the command to run on container start
 CMD ["python", "app.py"]
