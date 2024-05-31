@@ -1,5 +1,5 @@
 # Use Python Python 3.10 as the base image
-FROM public.ecr.aws/docker/library/python:3.10-alpine
+FROM public.ecr.aws/docker/library/python:3.11-alpine
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -17,4 +17,3 @@ ENV NAME World
 
 # Run the application when the container starts
 CMD ["python", "app/app.py"]
-CMD python app.py
