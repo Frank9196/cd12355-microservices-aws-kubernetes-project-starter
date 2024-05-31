@@ -3,10 +3,11 @@ kind: Service
 metadata:
   name: project3-api
 spec:
+  type: LoadBalancer
   selector:
     service: project3-api
   ports:
-  - name: "5050"
+  - name: "5153"
     protocol: TCP
     port: 5153
     targetPort: 5153
@@ -31,7 +32,7 @@ spec:
     spec:
       containers:
       - name: project3-api
-        image: 669172573612.dkr.ecr.us-east-1.amazonaws.com/udacity3:latest
+        image: 738750273276.dkr.ecr.us-east-1.amazonaws.com/hungnguyen-uda3:0.0.1
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
