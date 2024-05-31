@@ -10,8 +10,7 @@ COPY /analytics/ /app
 # Install dependencies from requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Expose port 5000
-EXPOSE 5000
+EXPOSE 5153
 
 # Set an environment variable
 ENV NAME World
