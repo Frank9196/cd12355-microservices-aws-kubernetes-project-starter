@@ -1,13 +1,21 @@
-FROM python:alpine3.19
+# Use Python Python 3.10 as the base image
+FROM public.ecr.aws/docker/library/python:3.10-alpine
 
+# Set the working directory inside the container
 WORKDIR /app
-# Copy the requirements file into the container at /app
-COPY requirements.txt /app/
 
-# Install any needed packages specified in requirements.txt
-RUN pip install -r requirements.txt
+# Copy the current directory contents to the container at /app
+COPY /analytics/ /app
 
-COPY . /app/
+# Install dependencies from requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Specify the command to run on container start
-CMD ["python", "app.py"]
+# Expose port 5000
+EXPOSE 5000
+
+# Set an environment variable
+ENV NAME World
+
+# Run the application when the container starts
+CMD ["python", "app/app.py"]
+CMD python app.py
