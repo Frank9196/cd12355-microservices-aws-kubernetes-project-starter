@@ -1,39 +1,37 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: project3-api
+  name: coworking
 spec:
   type: LoadBalancer
   selector:
-    service: project3-api
+    service: coworking
   ports:
-  - name: "5153"
+  - name: "80"
     protocol: TCP
     port: 5153
     targetPort: 5153
-
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: project3-api
+  name: coworking
   labels:
-    service: project3-api
+    name: coworking
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: project3-api
+      service: coworking
   template:
     metadata:
       labels:
-        service: project3-api
+        service: coworking
     spec:
       containers:
-      - name: project3-api
+      - name: coworking
         image: 738750273276.dkr.ecr.us-east-1.amazonaws.com/hungnguyen-uda3:0.0.1
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
             path: /health_check
@@ -47,8 +45,12 @@ spec:
           initialDelaySeconds: 5
           timeoutSeconds: 5
         envFrom:
-          - secretRef:
+        - configMapRef:
+            name: my-postgres-db-configmap
+        env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
               name: my-postgres-db-password
-          - configMapRef:
-              name: my-postgres-db-configmap
+              key: DB_PASSWORD
       restartPolicy: Always

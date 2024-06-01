@@ -1,19 +1,16 @@
 # Use Python Python 3.10 as the base image
-FROM public.ecr.aws/docker/library/python:3.11-alpine
+FROM python:3.11-slim
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copy the current directory contents to the container at /app
-COPY /analytics/ /app
+COPY ..
 
 # Install dependencies from requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 EXPOSE 5153
 
-# Set an environment variable
-ENV NAME World
-
 # Run the application when the container starts
-CMD ["python", "app/app.py"]
+CMD ["python", "./app.py"]
