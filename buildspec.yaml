@@ -1,20 +1,30 @@
 version: 0.2
 
+env:
+  variables:
+    IMAGE_REPO_NAME: "hungnguyen-uda3"  # Thay thế bằng tên repository của bạn
+
 phases:
   pre_build:
     commands:
       - echo Logging into ECR
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - echo Fetching the latest image tag...
+      - TAGS=$(aws ecr list-images --repository-name $IMAGE_REPO_NAME --query 'imageIds[*].imageTag' --output text | tr '\t' '\n' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
+      - LATEST_TAG=$(echo "$TAGS" | tail -n 1)
+      - echo Latest tag is $LATEST_TAG
+      - NEW_TAG=$(echo $LATEST_TAG | awk -F. '{print $1"."$2"."$3+1}')
+      - echo New tag is $NEW_TAG
   build:
     commands:
       - echo Starting build at `date`
-      - echo Building the Docker image...          
-      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
-      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG    
-      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest  
+      - echo Building the Docker image...
+      - docker build -t $IMAGE_REPO_NAME:$NEW_TAG .
+      - docker tag $IMAGE_REPO_NAME:$NEW_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$NEW_TAG
+      - docker tag $IMAGE_REPO_NAME:$NEW_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
   post_build:
     commands:
       - echo Completed build at `date`
       - echo Pushing the Docker image...
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$NEW_TAG
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
